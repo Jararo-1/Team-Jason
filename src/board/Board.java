@@ -5,6 +5,7 @@ import pieces.Pawn;
 import pieces.Rook;
 import pieces.Knight;
 import pieces.Bishop;
+import pieces.Queen;
 import utils.Color;
 import utils.Position;
 ;
@@ -52,6 +53,10 @@ public class Board {
         grid[0][5] = new Bishop(Color.WHITE, new Position(0, 5));
         grid[7][2] = new Bishop(Color.BLACK, new Position(7, 2));
         grid[7][5] = new Bishop(Color.BLACK, new Position(7, 5));
+
+        //place white queen on rank 1 and black queen on rank 8
+        grid[0][3] = new Queen(Color.WHITE, new Position(0, 3));
+        grid[7][3] = new Queen(Color.BLACK, new Position(7, 3));
     }
 
 
