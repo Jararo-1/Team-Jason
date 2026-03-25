@@ -3,6 +3,7 @@ package board;
 import pieces.Piece;
 import pieces.Pawn;
 import pieces.Rook;
+import pieces.Knight;
 import utils.Color;
 import utils.Position;
 ;
@@ -38,6 +39,12 @@ public class Board {
         grid[0][7] = new Rook(Color.WHITE, new Position(0, 7));
         grid[7][0] = new Rook(Color.BLACK, new Position(7, 0));
         grid[7][7] = new Rook(Color.BLACK, new Position(7, 7));
+
+        // place white knights on rank 1 and black knights on rank 8
+        grid[0][1] = new Knight(Color.WHITE, new Position(0, 1));
+        grid[0][6] = new Knight(Color.WHITE, new Position(0, 6));
+        grid[7][1] = new Knight(Color.BLACK, new Position(7, 1));
+        grid[7][6] = new Knight(Color.BLACK, new Position(7, 6));
     }
 
 
