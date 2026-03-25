@@ -2,6 +2,7 @@ package board;
 
 import pieces.Piece;
 import pieces.Pawn;
+import pieces.Rook;
 import utils.Color;
 import utils.Position;
 ;
@@ -26,16 +27,20 @@ public class Board {
      * Places all pieces in their starting position
      */
     private void initilizeBoard(){
-        // place white pawns on rank 2
+        // place white pawns on rank 2 and black pawns on rank 7
         for (int col = 0; col < 8; col++) {
             grid[1][col] = new Pawn(Color.WHITE, new Position(1, col));
-        }
-
-        // place black pawns on rank 7
-        for (int col = 0; col < 8; col++) {
             grid[6][col] = new Pawn(Color.BLACK, new Position(6, col));
         }
+
+        // place white rooks on rank 1 and black rooks on rank 8
+        grid[0][0] = new Rook(Color.WHITE, new Position(0, 0));
+        grid[0][7] = new Rook(Color.WHITE, new Position(0, 7));
+        grid[7][0] = new Rook(Color.BLACK, new Position(7, 0));
+        grid[7][7] = new Rook(Color.BLACK, new Position(7, 7));
     }
+
+
 
     /**
      * prints the current state of the board
