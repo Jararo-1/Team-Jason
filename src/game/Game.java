@@ -50,6 +50,20 @@ public class Game {
         String from = input.substring(0, 2).toUpperCase();
         String to = input.substring(3, 5).toUpperCase();
 
+        //convert standard chess notation to 0-7 array indexes
+        // 'A' is ASCII 65, so subtract 65 to get the array index
+        int fromCol = from.charAt(0) - 'A';
+        int fromRow = Character.getNumericValue(from.charAt(1)) - 1;
+        int toCol = to.charAt(0) - 'A';
+        int toRow = Character.getNumericValue(to.charAt(1)) - 1;
+
+        //create Position objects
+        utils.Position fromPosition = new utils.Position(fromRow, fromCol);
+        utils.Position toPosition = new utils.Position(toRow, toCol);
+
+        //move the piece
+        gameBoard.movePiece(fromPosition, toPosition);
+
         System.out.println("\n=> " + currentPlayer + " played: " + from + " to " + to + "\n");
 
         //switches turns

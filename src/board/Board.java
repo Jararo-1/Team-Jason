@@ -87,5 +87,34 @@ public class Board {
         }
             System.out.println("  A  B  C  D  E  F  G  H");
         }
+
+        /**
+         * Returns the piece at the specified position
+         * @param position the position The coordiniates to check
+         * @return the piece at the specified position or null if there is no piece there
+         */
+        public Piece getPiece(Position position){
+            return grid[position.getRow()][position.getCol()];
+        }
+
+        /**
+         * Physically moves a piece from one position to another
+         * @param from the starting position
+         * @param to the position to move the piece to
+         */
+        public void movePiece(Position from, Position to){
+            // grab the piece from the starting position
+            Piece pieceToMove = grid[from.getRow()][from.getCol()];
+            // place the piece at the new position
+            grid[to.getRow()][to.getCol()] = pieceToMove;
+            // remove the piece from the old position
+            grid[from.getRow()][from.getCol()] = null;
+
+            // update the piece's position
+            if(pieceToMove != null){
+                pieceToMove.updatePosition(to);
+            }
+        }
+
     }
 
