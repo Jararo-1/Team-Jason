@@ -1,6 +1,10 @@
 package board;
 
-import pieces.*;
+import pieces.Piece;
+import pieces.Pawn;
+import utils.Color;
+import utils.Position;
+;
 /**
  * Represents the 8x8 chess board and manages the state of the board
  */
@@ -22,7 +26,15 @@ public class Board {
      * Places all pieces in their starting position
      */
     private void initilizeBoard(){
-        // Initialize the board
+        // place white pawns on rank 2
+        for (int col = 0; col < 8; col++) {
+            grid[1][col] = new Pawn(Color.WHITE, new Position(1, col));
+        }
+
+        // place black pawns on rank 7
+        for (int col = 0; col < 8; col++) {
+            grid[6][col] = new Pawn(Color.BLACK, new Position(6, col));
+        }
     }
 
     /**
@@ -38,7 +50,8 @@ public class Board {
                 if(grid[row][col] == null){
                     System.out.print("## "); // Empty square
                 } else {
-                    System.out.print("P "); // placeholder for now
+                    //asks the piece for its symbol
+                    System.out.print(grid[row][col].getSymbol() + " ");
                 }
             }
             System.out.println(" " + (row + 1)); //prints the rank number

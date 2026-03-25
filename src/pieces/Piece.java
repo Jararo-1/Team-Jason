@@ -24,6 +24,12 @@ public abstract class Piece {
     public abstract List<Position> possibleMoves();
 
     /**
+     * Get the text representation of the piece
+     * @return a 2 character string representing the piece
+     */
+    public abstract String getSymbol();
+
+    /**
      * Udpates the position of the piece
      * @param newPosition the new position of the piece
      */
