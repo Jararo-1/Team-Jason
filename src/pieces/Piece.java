@@ -39,7 +39,7 @@ public abstract class Piece {
 
     // Getters
     public Color getColor() {
-        return color;
+        return this.color;
     }
 
     public Position getPosition() {
@@ -47,5 +47,4 @@ public abstract class Piece {
     }
 
 
-    
 }

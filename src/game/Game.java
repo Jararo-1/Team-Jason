@@ -57,12 +57,39 @@ public class Game {
         int toCol = to.charAt(0) - 'A';
         int toRow = Character.getNumericValue(to.charAt(1)) - 1;
 
-        //create Position objects
-        utils.Position fromPosition = new utils.Position(fromRow, fromCol);
-        utils.Position toPosition = new utils.Position(toRow, toCol);
+        //rules 1. Bounds Check: ensure the coordinates are between 0 - 7
+        if(fromRow < 0 || fromRow > 7 || fromCol < 0 || fromCol > 7 || toRow < 0 || toRow > 7 || toCol < 0 || toCol > 7){
+            System.out.println("Invalid input. Try again.");
+            continue; //skips to the next iteration of the loop
+        }
+
+        utils.Position fromPos = new utils.Position(fromRow, fromCol);
+        utils.Position toPos = new utils.Position(toRow, toCol);
+
+        pieces.Piece pieceToMove = gameBoard.getPiece(fromPos);
+        pieces.Piece pieceToCapture = gameBoard.getPiece(toPos);
+        utils.Color currentTurnColor = isWhiteTurn ? utils.Color.WHITE : utils.Color.BLACK;
+
+        //rule 2 empty square check
+        if(pieceToMove == null){
+            System.out.println("Invalid input. Try again.");
+            continue; //skips to the next iteration of the loop
+        }
+
+        // rule 3. Ensure the player is moving their own piece
+        if(pieceToMove.getColor() != currentTurnColor){
+            System.out.println("You can't move someone else's piece. Try again.");
+            continue; //skips to the next iteration of the loop
+        }
+
+        // rule 4. Friendly fire check
+        if(pieceToCapture != null && pieceToCapture.getColor() == currentTurnColor){
+            System.out.println("You can't capture your own piece. Try again.");
+            continue; //skips to the next iteration of the loop
+        }
 
         //move the piece
-        gameBoard.movePiece(fromPosition, toPosition);
+        gameBoard.movePiece(fromPos, toPos);
 
         System.out.println("\n=> " + currentPlayer + " played: " + from + " to " + to + "\n");
 
