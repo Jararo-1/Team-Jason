@@ -6,6 +6,7 @@ import pieces.Rook;
 import pieces.Knight;
 import pieces.Bishop;
 import pieces.Queen;
+import pieces.King;
 import utils.Color;
 import utils.Position;
 ;
@@ -57,6 +58,10 @@ public class Board {
         //place white queen on rank 1 and black queen on rank 8
         grid[0][3] = new Queen(Color.WHITE, new Position(0, 3));
         grid[7][3] = new Queen(Color.BLACK, new Position(7, 3));
+
+        //place white king on rank 1 and black king on rank 8
+        grid[0][4] = new King(Color.WHITE, new Position(0, 4));
+        grid[7][4] = new King(Color.BLACK, new Position(7, 4));
     }
 
 
