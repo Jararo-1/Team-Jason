@@ -22,11 +22,11 @@ Players take turns entering standard chess moves into the console. The format mu
 
 ## Feature List (Phase 1 Checklist)
 **Implemented Features:**
-- [ ] 8x8 Text-based chessboard display with A-H and 1-8 coordinates.
-- [ ] Turn-based game loop alternating between White and Black.
-- [ ] Standard chess notation parsing (e.g., "E2 E4").
-- [ ] Basic move validation (bounds checking, correct player turn).
-- [ ] Abstract Piece architecture with specific subclasses.
+- [x] 8x8 Text-based chessboard display with A-H and 1-8 coordinates.
+- [x] Turn-based game loop alternating between White and Black.
+- [x] Standard chess notation parsing (e.g., "E2 E4").
+- [x] Basic move validation (bounds checking, correct player turn).
+- [x] Abstract Piece architecture with specific subclasses.
 
 **Not Implemented / Phase 2 Features:**
 - [ ] Advanced rules: Castling, En Passant, Pawn Promotion.
