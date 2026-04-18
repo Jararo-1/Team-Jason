@@ -6,6 +6,7 @@ import java.awt.GridLayout;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
+import javax.swing.JOptionPane;
 /**
  * The main GUI window for the chess game
  * Displays the 8x8 chess board
@@ -78,7 +79,19 @@ public class ChessWindow extends JFrame {
                         java.awt.Component droopedOn = ChessWindow.this.getContentPane().getComponentAt(javax.swing.SwingUtilities.convertPoint(startingSquare, e.getPoint(), ChessWindow.this.getContentPane()));
                         if(droopedOn instanceof JPanel){
                             JPanel targetSquare = (JPanel) droopedOn;
-                        //remove any pieces that are captured then add our piece
+                        /**
+                         * checks if the target square has a king
+                         * if true, display a victory message and end the game
+                         */
+                        if(targetSquare.getComponentCount() > 0){
+                            JLabel capturedLabel = (JLabel) targetSquare.getComponent(0);
+                            String pieceText = capturedLabel.getText();
+                            if(pieceText.equals("\u2654 ") || pieceText.equals("\u265A ")){
+                                JOptionPane.showMessageDialog(null, "Checkmate! You win!");
+                                System.exit(0);
+                            }
+                        }
+
                         targetSquare.removeAll();
                         targetSquare.add(draggedPiece);
                         
