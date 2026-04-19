@@ -38,6 +38,14 @@ public class ChessWindow extends JFrame {
      * The text area that shows the history moves
      */
     private JTextArea moveHistoryArea;
+    /**
+     * The pannel holding pieces captued by white
+     */
+    private JPanel whiteCaptures;
+    /**
+     * The pannel holding pieces captued by black
+     */
+    private JPanel blackCaptures;
 
     //constructor
     public ChessWindow() {
@@ -59,7 +67,7 @@ public class ChessWindow extends JFrame {
 
                 //creates a new game window
                 ChessWindow freshGame = new ChessWindow();
-                freshGame.setSize(600, 600);
+                freshGame.setSize(900, 600);
                 freshGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 freshGame.setVisible(true);
             }
@@ -210,22 +218,53 @@ public class ChessWindow extends JFrame {
                                     JOptionPane.showMessageDialog(null, "Checkmate! You win!");
                                     System.exit(0);
                                 }
+                               /**
+                                 * Sorts the captured piece into the correct player's capture list.
+                                 * Checks if the piece belongs to the White army (Unicode 2654 to 2659).
+                                 */
+                                String whiteUnicode = "\u2654\u2655\u2656\u2657\u2658\u2659";
+                                
+                                if (whiteUnicode.contains(pieceText.trim())) {
+                                    // Black captured a White piece
+                                    blackCaptures.add(capturedLabel); 
+                                } else {
+                                    // White captured a Black piece
+                                    whiteCaptures.add(capturedLabel); 
+                                }
+                                
+                                // Refreshes the sidebars so the pieces appear instantly
+                                blackCaptures.revalidate();
+                                blackCaptures.repaint();
+                                whiteCaptures.revalidate();
+                                whiteCaptures.repaint();
                             }
 
                             targetSquare.removeAll();
                             targetSquare.add(draggedPiece);
                             /**
-                             * Calculates the square index
+                             * Calculates the target index
                              */
-                            int squareIndex = java.util.Arrays.asList(boardWrapper.getComponents()).indexOf(targetSquare);
-                            int col = squareIndex % 8;
-                            int row = squareIndex / 8;
-                            char collecter = (char) ('a' + col);
-                            int rowNumber = 8 - row;
+                            int targetIndex = java.util.Arrays.asList(boardWrapper.getComponents()).indexOf(targetSquare);
+                            int targetCol = targetIndex % 8;
+                            int targetRow = targetIndex / 8;
+                            char targetColLetter = (char) ('a' + targetCol);
+                            int targetRowNumber = 8 - targetRow;
+
                             /**
-                             * logs the piece movement and exact coordinate to the game history
+                             * Calculates the starting square
                              */
-                            moveHistoryArea.append("Moved: " + draggedPiece.getText().trim() + " to " + collecter + rowNumber + "\n");
+                            int startIndex = java.util.Arrays.asList(boardWrapper.getComponents()).indexOf(startingSquare);
+                            int startCol = startIndex % 8;
+                            int startRow = startIndex / 8;
+                            char startColLetter = (char) ('a' + startCol);
+                            int startRowNumber = 8 - startRow;
+                            
+                            /**
+                             * Logs the piece movement and exact coordinate to the game history
+                             */
+                            moveHistoryArea.append("Moved: " + draggedPiece.getText().trim() + 
+                                                   " from " + startColLetter + startRowNumber + 
+                                                   " to " + targetColLetter + targetRowNumber + "\n");
                             
                             // refresh both squares visually
                             targetSquare.revalidate();
@@ -259,11 +298,27 @@ public class ChessWindow extends JFrame {
         // makes sidebar to be 150 pixels wide
         scrollPane.setPreferredSize(new java.awt.Dimension(150, 0));
         this.add(scrollPane, java.awt.BorderLayout.EAST);
+        /**
+         * Sets up the captured pieces sidebar on the left side
+         */
+        JPanel captureSidebar = new JPanel(new GridLayout(2, 1));
+
+        whiteCaptures = new JPanel();
+        whiteCaptures.setBorder(javax.swing.BorderFactory.createTitledBorder("White's Captures"));
+
+        blackCaptures = new JPanel();
+        blackCaptures.setBorder(javax.swing.BorderFactory.createTitledBorder("Black's Captures"));
+
+        captureSidebar.add(whiteCaptures);
+        captureSidebar.add(blackCaptures);
+
+        captureSidebar.setPreferredSize(new java.awt.Dimension(150, 0));
+        this.add(captureSidebar, java.awt.BorderLayout.WEST);
     }
 
     public static void main(String[] args){
         ChessWindow window = new ChessWindow();
-        window.setSize(600, 600);
+        window.setSize(900, 600);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //closes the window
         window.setVisible(true); //makes window visible
     }
