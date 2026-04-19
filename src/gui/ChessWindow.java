@@ -46,6 +46,10 @@ public class ChessWindow extends JFrame {
      * The pannel holding pieces captued by black
      */
     private JPanel blackCaptures;
+    /**
+     * the memory stack for the undo button
+     */
+    private java.util.Stack<String[]> undoStack = new java.util.Stack<>();
 
     //constructor
     public ChessWindow() {
@@ -207,6 +211,27 @@ public class ChessWindow extends JFrame {
                         if(droppedOn instanceof JPanel){
                             JPanel targetSquare = (JPanel) droppedOn;
                             
+                            String[] snapshot = new String[67];
+                            for (int i = 0; i < 64; i++) {
+                                JPanel sq = (JPanel) boardWrapper.getComponent(i);
+                                if (sq.getComponentCount() > 0) {
+                                    snapshot[i] = ((JLabel) sq.getComponent(0)).getText();
+                                } else {
+                                    snapshot[i] = " ";
+                                }
+                            }
+                            snapshot[64] = moveHistoryArea.getText();
+                            
+                            String wCaps = "";
+                            for(java.awt.Component c : whiteCaptures.getComponents()) wCaps += ((JLabel)c).getText();
+                            snapshot[65] = wCaps;
+                            
+                            String bCaps = "";
+                            for(java.awt.Component c : blackCaptures.getComponents()) bCaps += ((JLabel)c).getText();
+                            snapshot[66] = bCaps;
+                            
+                            undoStack.push(snapshot);
+                            
                             /**
                              * checks if the target square has a king
                              * if true, display a victory message and end the game
@@ -240,6 +265,11 @@ public class ChessWindow extends JFrame {
                             }
 
                             targetSquare.removeAll();
+                            /**
+                             * Takes a 67-slot snapshot of the board, text area, and graveyards
+                             */
+
+
                             targetSquare.add(draggedPiece);
                             /**
                              * Calculates the target index
@@ -297,7 +327,75 @@ public class ChessWindow extends JFrame {
         JScrollPane scrollPane = new JScrollPane(moveHistoryArea);
         // makes sidebar to be 150 pixels wide
         scrollPane.setPreferredSize(new java.awt.Dimension(150, 0));
-        this.add(scrollPane, java.awt.BorderLayout.EAST);
+        /**
+         * The undo button that pops the last state and rebuilds the board
+         */
+        javax.swing.JButton undoButton = new javax.swing.JButton("Undo Move");
+        undoButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (!undoStack.isEmpty()) {
+                    String[] lastState = undoStack.pop();
+                    
+                    // Restores the 64 squares
+                    java.awt.Component[] squares = boardPanel.getComponents();
+                    for (int i = 0; i < 64; i++) {
+                        JPanel sq = (JPanel) squares[i];
+                        sq.removeAll();
+                        if (!lastState[i].equals(" ")) {
+                            JLabel restoredPiece = new JLabel(lastState[i]);
+                            restoredPiece.setFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 40));
+                            sq.add(restoredPiece);
+                        }
+                        sq.revalidate();
+                        sq.repaint();
+                    }
+                    
+                    // Restores the history text
+                    moveHistoryArea.setText(lastState[64]);
+                    
+                  /**
+                     * Restores White's graveyard with size-40 font
+                     */
+                    whiteCaptures.removeAll();
+                    String[] whitePieces = lastState[65].split(" ");
+                    for (String piece : whitePieces) {
+                        if (!piece.isEmpty()) {
+                            JLabel restoredCapture = new JLabel(piece + " ");
+                            restoredCapture.setFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 40));
+                            whiteCaptures.add(restoredCapture);
+                        }
+                    }
+                    whiteCaptures.revalidate();
+                    whiteCaptures.repaint();
+                    
+                    /**
+                     * Restores Black's graveyard with size-40 font
+                     */
+                    blackCaptures.removeAll();
+                    String[] blackPieces = lastState[66].split(" ");
+                    for (String piece : blackPieces) {
+                        if (!piece.isEmpty()) {
+                            JLabel restoredCapture = new JLabel(piece + " ");
+                            restoredCapture.setFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 40));
+                            blackCaptures.add(restoredCapture);
+                        }
+                    }
+                    blackCaptures.revalidate();
+                    blackCaptures.repaint();
+                }
+            }
+        });
+
+        /**
+         * Wraps the scroll pane and undo button together
+         */
+        JPanel historySidebar = new JPanel(new java.awt.BorderLayout());
+        historySidebar.add(scrollPane, java.awt.BorderLayout.CENTER);
+        historySidebar.add(undoButton, java.awt.BorderLayout.SOUTH);
+        historySidebar.setPreferredSize(new java.awt.Dimension(150, 0));
+        
+        this.add(historySidebar, java.awt.BorderLayout.EAST);
+
         /**
          * Sets up the captured pieces sidebar on the left side
          */
