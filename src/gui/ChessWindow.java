@@ -5,6 +5,7 @@ import javax.swing.JLabel;
 import java.awt.GridLayout;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.awt.event.MouseAdapter;
 import javax.swing.JOptionPane;
 import javax.swing.JMenuItem;
@@ -15,6 +16,9 @@ import java.awt.event.ActionEvent;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JFileChooser;
+import java.io.FileWriter;
+import java.util.Scanner;
 /**
  * The main GUI window for the chess game
  * Displays the 8x8 chess board
@@ -62,7 +66,60 @@ public class ChessWindow extends JFrame {
         });
 
         JMenuItem save = new JMenuItem("Save Game");
+        /**
+         * sensor to detect clicks on the save button
+         * Opens a file browser and saves the game history text to a file
+         */
+        save.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                JFileChooser fileBrowser = new JFileChooser();
+                // if user clicks Save in the pop-up
+                if(fileBrowser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION){
+                    try{
+                    //open the file
+                    FileWriter writer = new FileWriter(fileBrowser.getSelectedFile());
+                    //write the history text to the file
+                    writer.write(moveHistoryArea.getText());
+                    //close the file
+                    writer.close();
+                    JOptionPane.showMessageDialog(null, "Game saved successfully!");
+                    }
+                    catch(Exception ex){
+                        JOptionPane.showMessageDialog(null, "Error saving game!");
+                    }
+                }
+            }
+        });
         JMenuItem load = new JMenuItem("Load Game");
+        /**
+         * Sensor to deterct clicks on the Load Game button
+         * Opens a file browser and loads the game history text from a file
+         */
+        load.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                JFileChooser fileBrowser = new JFileChooser();
+                //if the user clicks "Open" in the pop-up
+                if(fileBrowser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION){
+                    try{
+                        //clear out the current sidebar
+                        moveHistoryArea.setText("Game History:\n\n");
+
+                        //Set up the scanner to read the file
+                        Scanner reader = new Scanner(fileBrowser.getSelectedFile());
+
+                        //read the file lin by line and add it to the sidebar
+                        while(reader.hasNextLine()){
+                            moveHistoryArea.append(reader.nextLine() + "\n");
+                        }
+                        reader.close();
+
+                        JOptionPane.showMessageDialog(null, "Game loaded successfully!");
+                    } catch(Exception ex){
+                        JOptionPane.showMessageDialog(null, "Error loading game!");
+                    }
+                }
+            }
+        });
 
         //add items to menu
         gameMenu.add(newGame);
@@ -158,9 +215,17 @@ public class ChessWindow extends JFrame {
                             targetSquare.removeAll();
                             targetSquare.add(draggedPiece);
                             /**
-                             * logs the piece movement to the game history area
+                             * Calculates the square index
                              */
-                            moveHistoryArea.append("Moved: " + draggedPiece.getText() + "\n");
+                            int squareIndex = java.util.Arrays.asList(boardWrapper.getComponents()).indexOf(targetSquare);
+                            int col = squareIndex % 8;
+                            int row = squareIndex / 8;
+                            char collecter = (char) ('a' + col);
+                            int rowNumber = 8 - row;
+                            /**
+                             * logs the piece movement and exact coordinate to the game history
+                             */
+                            moveHistoryArea.append("Moved: " + draggedPiece.getText().trim() + " to " + collecter + rowNumber + "\n");
                             
                             // refresh both squares visually
                             targetSquare.revalidate();
