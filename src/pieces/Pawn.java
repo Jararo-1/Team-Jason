@@ -26,7 +26,7 @@ public class Pawn extends Piece{
 
     /**
      * Validates the pawn's moves
-     * @param baord The currrent state of the board
+     * @param board The currrent state of the board
      * @param end the Target position
      * @return true if the move is valid
      */
