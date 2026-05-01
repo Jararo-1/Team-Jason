@@ -24,6 +24,15 @@ public abstract class Piece {
     public abstract List<Position> possibleMoves();
 
     /**
+     * Checks if a move is valid for this specific piece
+     * *@param  board the current state of the board
+     * @param end the target position the player want to move this piece to
+     * @return true if the move follows the piece's rules, false otherwise
+     */
+
+    public abstract isValidMove(board.Board board, Position end);
+
+    /**
      * Get the text representation of the piece
      * @return a 2 character string representing the piece
      */
