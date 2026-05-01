@@ -116,5 +116,53 @@ public class Board {
             }
         }
 
+        /**
+         * Find the king's current position on the board
+         * @param color The color of the king
+         * @return The position of the king, or null if the king is not found
+         */
+        public utils.Position getKingPosition(utils.Color color){
+            for(int row = 0; row < 8; row++){
+                for(int col = 0; col < 8; col ++){
+                    utils.Position pos = new utils.Position(row, col);
+                    pieces.Piece p = getPiece(pos);
+
+                    //check if the piece is a king of the correct color
+                    if(p != null && p.getColor() == color && p instanceof pieces.King){
+                        return pos;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /**
+         * Checks if the king is under attack
+         * @param color The color of the defending king
+         * @return True if the king is under check, false otherwise
+         */
+        public boolean isInCheck(utils.Color color){
+            utils.Position kingPos = getKingPosition(color);
+            if (kingPos == null){
+                return false;
+            }
+
+            // loop thorugh every square on the board to find enemy pieces
+            for(int row = 0; row < 8; row++){
+                for(int col = 0; col < 8; col++){
+                    utils.Position pos = new utils.Position(row, col);
+                    pieces.Piece enemyPiece = getPiece(pos);
+
+                    // if it is an enemy piece, see if isValidMove allows it to hit the king
+                    if (enemyPiece !=  null && enemyPiece.getColor() != color){
+                        if(enemyPiece.isValidMove(this, kingPos)){
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
     }
 

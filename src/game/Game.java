@@ -99,6 +99,18 @@ public class Game {
 
         System.out.println("\n=> " + currentPlayer + " played: " + from + " to " + to + "\n");
 
+        /**
+         * Rule 6. Anounce check
+         * Check if the move puts the ENEMY king in check
+         */
+        utils.Color enemyColor = isWhiteTurn ? utils.Color.BLACK : utils.Color.WHITE;
+        if(gameBoard.isInCheck(enemyColor)){
+            String enemyName = isWhiteTurn ? "Black" : "White";
+            System.out.println("************************");
+            System.out.println("CHECK! " + enemyName + "'s king is under attack!");
+            System.out.println("************************");
+        }
+
         //switches turns
         isWhiteTurn = !isWhiteTurn;
         }
