@@ -30,7 +30,7 @@ public class Knight extends Piece {
      * @return true if the move is valid false otherwise
      */
     @Override
-    public boolean isVAlidMove(board.Board board, Position end) {
+    public boolean isValidMove(board.Board board, Position end) {
         int rowDiff = Math.abs(this.position.getRow() - end.getRow());
         int colDiff = Math.abs(this.position.getCol() - end.getCol());
 
