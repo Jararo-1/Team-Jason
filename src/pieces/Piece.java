@@ -30,7 +30,7 @@ public abstract class Piece {
      * @return true if the move follows the piece's rules, false otherwise
      */
 
-    public abstract isValidMove(board.Board board, Position end);
+    public abstract boolean isValidMove(board.Board board, Position end);
 
     /**
      * Get the text representation of the piece

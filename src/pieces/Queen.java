@@ -37,7 +37,7 @@ public class Queen extends Piece {
         int endRow = end.getRow();
         int endCol = end.getCol();
 
-        boolean isStraight = (startRow = endRow) || (startCol == endCol);
+        boolean isStraight = (startRow == endRow) || (startCol == endCol);
         boolean isDiagonal = Math.abs(startRow - endRow) == Math.abs(startCol - endCol);
 
         // queen must move straight or diagonal

@@ -31,15 +31,15 @@ public class Pawn extends Piece{
      * @return true if the move is valid
      */
     @Override
-    public boolean isValidMove(Board baord, Position end) {
+    public boolean isValidMove(board.Board board, Position end) {
         int startRow = this.position.getRow();
         int startCol = this.position.getCol();
         int endRow = end.getRow();
         int endCol = end.getCol();
 
-        // white pawns move up (-1) rows 6 and 7 are the starting rows
-        int direction = (this.color == Color.WHITE) ? -1 : 1;
-        int startingRow = (this.color == Color.WHITE) ? 6 : 1;
+        // white pawns start at row 1 and move down the array
+        int direction = (this.color == Color.WHITE) ? 1 : -1;
+        int startingRow = (this.color == Color.WHITE) ? 1 : 6;
 
         pieces.Piece targetPiece = board.getPiece(end);
 

@@ -42,8 +42,8 @@ public class Rook extends Piece {
         }
 
         // figure out which direction we are stepping
-        int rowStep = integer.compare(endRow, startRow);
-        int colStep = integer.compare(endCol, startCol);
+        int rowStep = Integer.compare(endRow, startRow);
+        int colStep = Integer.compare(endCol, startCol);
 
         //check no pieces along the path
         int currentRow = startRow + rowStep;

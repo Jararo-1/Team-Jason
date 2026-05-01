@@ -53,9 +53,9 @@ public class Game {
         //convert standard chess notation to 0-7 array indexes
         // 'A' is ASCII 65, so subtract 65 to get the array index
         int fromCol = from.charAt(0) - 'A';
-        int fromRow = Character.getNumericValue(from.charAt(1)) - 1;
+        int fromRow = Character.getNumericValue(from.charAt(1) - 1);
         int toCol = to.charAt(0) - 'A';
-        int toRow = Character.getNumericValue(to.charAt(1)) - 1;
+        int toRow = Character.getNumericValue(to.charAt(1) - 1);
 
         //rules 1. Bounds Check: ensure the coordinates are between 0 - 7
         if(fromRow < 0 || fromRow > 7 || fromCol < 0 || fromCol > 7 || toRow < 0 || toRow > 7 || toCol < 0 || toCol > 7){
@@ -85,6 +85,12 @@ public class Game {
         // rule 4. Friendly fire check
         if(pieceToCapture != null && pieceToCapture.getColor() == currentTurnColor){
             System.out.println("You can't capture your own piece. Try again.");
+            continue; //skips to the next iteration of the loop
+        }
+
+        // rule 5. Valid move check
+        if(!pieceToMove.isValidMove(gameBoard, toPos)){
+            System.out.println("Illegal move for that piece! Try again.");
             continue; //skips to the next iteration of the loop
         }
 
