@@ -423,9 +423,9 @@ public class ChessWindow extends JFrame {
 
             // 5. Log the move history
             char startColLetter = (char) ('a' + startPos.getCol());
-            int startRowNumber = 8 - startPos.getRow();
+            int startRowNumber = startPos.getRow() + 1;
             char endColLetter = (char) ('a' + endPos.getCol());
-            int endRowNumber = 8 - endPos.getRow();
+            int endRowNumber = endPos.getRow() + 1;
             moveHistoryArea.append("Moved: " + piece.getText().trim() + " from " + startColLetter + startRowNumber + " to " + endColLetter + endRowNumber + "\n");
 
             // 6. check for the Check pop up
