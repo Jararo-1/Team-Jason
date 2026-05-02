@@ -51,6 +51,16 @@ public class ChessWindow extends JFrame {
      */
     private java.util.Stack<String[]> undoStack = new java.util.Stack<>();
 
+    /**
+     * The backend logic board that dictates rules
+     */
+    private board.Board gameBoard = new board.Board();
+
+    /**
+     * Tracks whose turn it is currently
+     */
+    private boolean isWhiteturn = true;
+
     //constructor
     public ChessWindow() {
         /**
@@ -190,20 +200,16 @@ public class ChessWindow extends JFrame {
              * mouse listener. Handles dragging of pieces
              */
             square.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e){
-                    startingSquare = (JPanel) e.getSource();
-                    //grabs piece if square has a piece
-                    if(startingSquare.getComponentCount() > 0){
-                        draggedPiece = (JLabel) startingSquare.getComponent(0);
+                public void mousePressed(MouseEvent e) {
+                    JPanel clickedSquare = (JPanel) e.getSource();
+                    if (clickedSquare.getComponentCount() > 0) {
+                        startingSquare = clickedSquare;
+                        draggedPiece = (JLabel) clickedSquare.getComponent(0);
                     }
                 }
-
                 public void mouseReleased(MouseEvent e){
-                    if (draggedPiece != null) {
-                        // Find the wrapper box holding all the squares
+                    if(draggedPiece != null){
                         java.awt.Container boardWrapper = startingSquare.getParent();
-                        
-                        // Asks the wrapper box which square we dropped the piece on
                         java.awt.Component droppedOn = boardWrapper.getComponentAt(
                             javax.swing.SwingUtilities.convertPoint(startingSquare, e.getPoint(), boardWrapper)
                         );
@@ -211,102 +217,30 @@ public class ChessWindow extends JFrame {
                         if(droppedOn instanceof JPanel){
                             JPanel targetSquare = (JPanel) droppedOn;
                             
-                            String[] snapshot = new String[67];
-                            for (int i = 0; i < 64; i++) {
-                                JPanel sq = (JPanel) boardWrapper.getComponent(i);
-                                if (sq.getComponentCount() > 0) {
-                                    snapshot[i] = ((JLabel) sq.getComponent(0)).getText();
-                                } else {
-                                    snapshot[i] = " ";
-                                }
-                            }
-                            snapshot[64] = moveHistoryArea.getText();
-                            
-                            String wCaps = "";
-                            for(java.awt.Component c : whiteCaptures.getComponents()) wCaps += ((JLabel)c).getText();
-                            snapshot[65] = wCaps;
-                            
-                            String bCaps = "";
-                            for(java.awt.Component c : blackCaptures.getComponents()) bCaps += ((JLabel)c).getText();
-                            snapshot[66] = bCaps;
-                            
-                            undoStack.push(snapshot);
-                            
-                            /**
-                             * checks if the target square has a king
-                             * if true, display a victory message and end the game
-                             */
-                            if(targetSquare.getComponentCount() > 0){
-                                JLabel capturedLabel = (JLabel) targetSquare.getComponent(0);
-                                String pieceText = capturedLabel.getText();
-                                if(pieceText.trim().equals("\u2654") || pieceText.trim().equals("\u265A")){
-                                    JOptionPane.showMessageDialog(null, "Checkmate! You win!");
-                                    System.exit(0);
-                                }
-                               /**
-                                 * Sorts the captured piece into the correct player's capture list.
-                                 * Checks if the piece belongs to the White army (Unicode 2654 to 2659).
-                                 */
-                                String whiteUnicode = "\u2654\u2655\u2656\u2657\u2658\u2659";
-                                
-                                if (whiteUnicode.contains(pieceText.trim())) {
-                                    // Black captured a White piece
-                                    blackCaptures.add(capturedLabel); 
-                                } else {
-                                    // White captured a Black piece
-                                    whiteCaptures.add(capturedLabel); 
-                                }
-                                
-                                // Refreshes the sidebars so the pieces appear instantly
-                                blackCaptures.revalidate();
-                                blackCaptures.repaint();
-                                whiteCaptures.revalidate();
-                                whiteCaptures.repaint();
-                            }
-
-                            targetSquare.removeAll();
-                            /**
-                             * Takes a 67-slot snapshot of the board, text area, and graveyards
-                             */
-
-
-                            targetSquare.add(draggedPiece);
-                            /**
-                             * Calculates the target index
-                             */
                             int targetIndex = java.util.Arrays.asList(boardWrapper.getComponents()).indexOf(targetSquare);
-                            int targetCol = targetIndex % 8;
-                            int targetRow = targetIndex / 8;
-                            char targetColLetter = (char) ('a' + targetCol);
-                            int targetRowNumber = 8 - targetRow;
-
-                            /**
-                             * Calculates the starting square
-                             */
                             int startIndex = java.util.Arrays.asList(boardWrapper.getComponents()).indexOf(startingSquare);
-                            int startCol = startIndex % 8;
-                            int startRow = startIndex / 8;
-                            char startColLetter = (char) ('a' + startCol);
-                            int startRowNumber = 8 - startRow;
-                            
-                            /**
-                             * Logs the piece movement and exact coordinate to the game history
-                             */
-                            moveHistoryArea.append("Moved: " + draggedPiece.getText().trim() + 
-                                                   " from " + startColLetter + startRowNumber + 
-                                                   " to " + targetColLetter + targetRowNumber + "\n");
-                            
-                            // refresh both squares visually
-                            targetSquare.revalidate();
-                            targetSquare.repaint();
-                            startingSquare.revalidate();
-                            startingSquare.repaint();
+
+                            //1. Calculate visual rows and columns from the gui
+                            int visualStartRow = startIndex / 8;
+                            int visualStartCol = startIndex % 8;
+                            int visualEndRow = targetIndex / 8;
+                            int visualEndCol = targetIndex % 8;
+
+                            //2. flip the rows to match upside-down backend board
+                            int backendStartRow = 7 - visualStartRow;
+                            int backendEndRow = 7 - visualEndRow;
+
+                            //3. Create the backend positions using the flipped rows
+                            utils.Position startPos = new utils.Position(backendStartRow, visualStartCol);
+                            utils.Position endPos = new utils.Position(backendEndRow, visualEndCol);
+
+                            //Send the data to helper method
+                            attemptMove(startingSquare, targetSquare, draggedPiece, startPos, endPos, boardWrapper);
                         }
-                        
-                        //clear the dragged piece memory
                         draggedPiece = null;
                     }
                 }
+                    
             });
 
             /**
@@ -412,6 +346,107 @@ public class ChessWindow extends JFrame {
 
         captureSidebar.setPreferredSize(new java.awt.Dimension(150, 0));
         this.add(captureSidebar, java.awt.BorderLayout.WEST);
+    }
+
+    /**
+     * Checks if a move is legal based on the current board state and turn
+     */
+    private boolean isLegalMove(utils.Position start, utils.Position end){
+        pieces.Piece pieceToMove = gameBoard.getPiece(start);
+        pieces.Piece targetPiece = gameBoard.getPiece(end);
+        utils.Color currentTurnColor = isWhiteturn ? utils.Color.WHITE : utils.Color.BLACK;
+
+        if (pieceToMove == null || pieceToMove.getColor() != currentTurnColor) {
+            return false;
+        }
+        if(targetPiece != null && targetPiece.getColor() == currentTurnColor){
+            return false;
+        }
+        return pieceToMove.isValidMove(gameBoard, end);
+    }
+
+    /**
+     * Handles the Successful movement of a piece, updates backend, visuals and history
+     */
+    private void attemptMove(JPanel startSq, JPanel targetSq, JLabel piece, utils.Position startPos, utils.Position endPos, java.awt.Container boardWrapper){
+        if(isLegalMove(startPos, endPos)){
+            
+            // 1. Save snapshot for undo Button
+            String[] snapshot = new String[67];
+            for(int i = 0; i < 64; i++){
+                JPanel sq = (JPanel) boardWrapper.getComponent(i);
+                if(sq.getComponentCount() > 0){
+                    snapshot[i] = ((JLabel) sq.getComponent(0)).getText();
+                }
+                else{
+                    snapshot[i] = " ";
+                }
+            }
+            snapshot[64] = moveHistoryArea.getText();
+            String wCaps = "";
+            for(java.awt.Component c : whiteCaptures.getComponents()) wCaps += ((JLabel)c).getText();
+            snapshot[65] = wCaps;
+            String bCaps = "";
+            for(java.awt.Component c : blackCaptures.getComponents()) bCaps += ((JLabel)c).getText();
+            snapshot[66] = bCaps;
+            undoStack.push(snapshot);
+
+            // 2. Update Backend
+            gameBoard.movePiece(startPos, endPos);
+
+            //3. Handle Captures visually
+            if(targetSq.getComponentCount() > 0){
+                JLabel capturedLabel = (JLabel) targetSq.getComponent(0);
+                String pieceText = capturedLabel.getText().trim();
+
+                //Checkmate trigger
+                if(pieceText.equals("\u2654") || pieceText.equals("\u265A")){
+                    JOptionPane.showMessageDialog(null, "Checkmate! Game Over.");
+                    System.exit(0);
+                }
+
+                //Sort to Graveyard
+                if("\u2654\u2655\u2656\u2657\u2658\u2659".contains(pieceText)) {
+                    blackCaptures.add(capturedLabel);
+                }
+                else{
+                    whiteCaptures.add(capturedLabel);
+                }
+                blackCaptures.revalidate();
+                blackCaptures.repaint();
+                whiteCaptures.revalidate();
+                whiteCaptures.repaint();
+            }
+            // 4. Move the pieces visually
+            targetSq.removeAll();
+            targetSq.add(piece);
+
+            // 5. Log the move history
+            char startColLetter = (char) ('a' + startPos.getCol());
+            int startRowNumber = 8 - startPos.getRow();
+            char endColLetter = (char) ('a' + endPos.getCol());
+            int endRowNumber = 8 - endPos.getRow();
+            moveHistoryArea.append("Moved: " + piece.getText().trim() + " from " + startColLetter + startRowNumber + " to " + endColLetter + endRowNumber + "\n");
+
+            // 6. check for the Check pop up
+            utils.Color enemyColor = isWhiteturn ? utils.Color.BLACK : utils.Color.WHITE;
+            if (gameBoard.isInCheck(enemyColor)){
+                JOptionPane.showMessageDialog(null, "CHECK!");
+            }
+
+            //7. Switch Turns and Refresh
+            isWhiteturn = !isWhiteturn;
+            targetSq.revalidate();
+            targetSq.repaint();
+            startSq.revalidate();
+            startSq.repaint();
+        }
+        else{
+            //Illegal Move Snap the peice back visually
+            startSq.add(piece);
+            startSq.revalidate();
+            startSq.repaint();
+        }
     }
 
     public static void main(String[] args){
